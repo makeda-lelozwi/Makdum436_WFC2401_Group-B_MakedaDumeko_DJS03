@@ -80,24 +80,21 @@ document.querySelector("[data-search-authors]").appendChild(authorsHtml);
 //TOGGLING DAY AND NIGHT THEMES
 if (
   window.matchMedia &&
-  window.matchMedia("(prefers-color-scheme: dark)").matches
+  window.matchMedia("(prefers-color-scheme: dark)").matches //checks if the user prefers dark mode on their system
 ) {
-  document.querySelector("[data-settings-theme]").value = "night";
-  document.documentElement.style.setProperty("--color-dark", "255, 255, 255");
+  document.querySelector("[data-settings-theme]").value = "night"; //selects the "night" option from the "overlay__input" <select>
+  document.documentElement.style.setProperty("--color-dark", "255, 255, 255"); //sets base colors (CSS) to match a dark theme
   document.documentElement.style.setProperty("--color-light", "10, 10, 20");
 } else {
-  document.querySelector("[data-settings-theme]").value = "day";
-  document.documentElement.style.setProperty("--color-dark", "10, 10, 20");
+  document.querySelector("[data-settings-theme]").value = "day"; //selects the "day" option from the "overlay__input" <select>
+  document.documentElement.style.setProperty("--color-dark", "10, 10, 20"); //sets base colors (CSS) to match a light theme
   document.documentElement.style.setProperty("--color-light", "255, 255, 255");
 }
 
-
-
+//LOGIC FOR ENABLING THE SHOW MORE BUTTON
 document.querySelector("[data-list-button]").innerText = `Show more (${
   books.length - BOOKS_PER_PAGE
-})`;
-document.querySelector("[data-list-button]").disabled =
-  matches.length - page * BOOKS_PER_PAGE > 0;
+})`; //as the #books displays /, the number in the brackets should go down
 
 document.querySelector("[data-list-button]").innerHTML = `
     <span>Show more</span>
@@ -106,33 +103,43 @@ document.querySelector("[data-list-button]").innerHTML = `
         ? matches.length - page * BOOKS_PER_PAGE
         : 0
     })</span>
-`;
+`; //this is basically repetition
 
+document.querySelector("[data-list-button]").disabled =
+  matches.length - page * BOOKS_PER_PAGE > 0; //if there are no more books to be displayed then the button is set to disabled
+
+//EVENT LISTENERS
+//"Cancel" to close the search modal
 document.querySelector("[data-search-cancel]").addEventListener("click", () => {
   document.querySelector("[data-search-overlay]").open = false;
 });
 
+//"Cancel" to close the settings modal (where user can choose between light and dark theme)
 document
   .querySelector("[data-settings-cancel]")
   .addEventListener("click", () => {
     document.querySelector("[data-settings-overlay]").open = false;
   });
 
+//Opens the search modal and focuses on the input where users can type-in a search for a title
 document.querySelector("[data-header-search]").addEventListener("click", () => {
   document.querySelector("[data-search-overlay]").open = true;
   document.querySelector("[data-search-title]").focus();
 });
 
+//Opens the settings modal
 document
   .querySelector("[data-header-settings]")
   .addEventListener("click", () => {
     document.querySelector("[data-settings-overlay]").open = true;
   });
 
+//Closes the modal that has more info about a selected book
 document.querySelector("[data-list-close]").addEventListener("click", () => {
   document.querySelector("[data-list-active]").open = false;
 });
 
+//Changing the theme when the user manually sets it from settings (instead of from system preferences)
 document
   .querySelector("[data-settings-form]")
   .addEventListener("submit", (event) => {
@@ -153,7 +160,7 @@ document
         "255, 255, 255"
       );
     }
-
+    //closes the settings modal after changing the theme and pressing save (not saved to localStorage)
     document.querySelector("[data-settings-overlay]").open = false;
   });
 
@@ -162,9 +169,13 @@ document
   .addEventListener("submit", (event) => {
     event.preventDefault();
     const formData = new FormData(event.target);
-    const filters = Object.fromEntries(formData);
-    const result = [];
+    const filters = Object.fromEntries(formData); //converts form data into an object
+    const result = []; //empty array to store filtered books
 
+    /*This for loop checks each book in the books array for any book that matches the genre that was selected by the user or for any books whose
+    title matches the one typed in by the user. 
+    
+    */
     for (const book of books) {
       let genreMatch = filters.genre === "any";
 
@@ -188,6 +199,7 @@ document
     page = 1;
     matches = result;
 
+    //Error handling for if there is no book that matches the search/filter, then the message already typed in the HTML will show
     if (result.length < 1) {
       document
         .querySelector("[data-list-message]")
@@ -198,7 +210,9 @@ document
         .classList.remove("list__message_show");
     }
 
-    document.querySelector("[data-list-items]").innerHTML = "";
+    document.querySelector("[data-list-items]").innerHTML = ""; //makes the page that's supposed to show all the book previews empty
+
+    //DISPLAYING THE FILTERED BOOKS TO THE DOM (can reuse the earlier function for displaying objects but tweak it a little)
     const newItems = document.createDocumentFragment();
 
     for (const { author, id, image, title } of result.slice(
@@ -225,6 +239,8 @@ document
     }
 
     document.querySelector("[data-list-items]").appendChild(newItems);
+
+    //same logic for the "show more" button
     document.querySelector("[data-list-button]").disabled =
       matches.length - page * BOOKS_PER_PAGE < 1;
 
@@ -241,6 +257,7 @@ document
     document.querySelector("[data-search-overlay]").open = false;
   });
 
+//EXTENDING THE PAGE AND SHOWING MORE BOOKS AFTER CLICKING "SHOW MORE"
 document.querySelector("[data-list-button]").addEventListener("click", () => {
   const fragment = document.createDocumentFragment();
 
@@ -271,6 +288,7 @@ document.querySelector("[data-list-button]").addEventListener("click", () => {
   page += 1;
 });
 
+//EVENT LISTENER FOR DISPLAYING BOOK INFO WHEN CLICKING ON IT
 document
   .querySelector("[data-list-items]")
   .addEventListener("click", (event) => {
