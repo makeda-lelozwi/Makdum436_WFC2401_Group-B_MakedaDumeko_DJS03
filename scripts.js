@@ -6,8 +6,6 @@ const booksListDiv = document.querySelector("[data-list-items]");
 const genreDropDownMenu = document.querySelector("[data-search-genres]");
 const authorDropDownMenu = document.querySelector("[data-search-authors]");
 
-const themeToggleSelect = document.querySelector("[data-settings-theme]");
-
 const showMoreBtn = document.querySelector("[data-list-button]");
 
 const searchBtn = document.querySelector("[data-header-search]");
@@ -66,13 +64,10 @@ displayBooksPreviews(matches, authors);
 
 //CREATING THE LIST OF ALL GENRES IN THE SEARCH MODAL
 
-//doc. frag. for the genres drop-down found in the search modal
-
-//ensures that the first option in the select is "all genres"
-
-//loops through the genres array and creates an <option> for each genre and appends all the genre options to the genreHTML doc. fragment
-
-//pushes the genreHTML doc. fragment to the DOM via the div named data-search-genres
+/*doc. frag. for the genres drop-down found in the search modal
+ensures that the first option in the select is "all genres"
+loops through the genres array and creates an <option> for each genre and appends all the genre options to the genreHTML doc. fragment
+pushes the genreHTML doc. fragment to the DOM via the div named data-search-genres*/
 
 const createSelect = (array, name, dropdown) => {
   const selectFrag = document.createDocumentFragment();
@@ -97,23 +92,29 @@ createSelect(genres, "Genre", genreDropDownMenu);
 //CREATING THE LIST OF ALL AUTHORS IN THE SEARCH MODAL
 createSelect(authors, "Author", authorDropDownMenu);
 
-
 //TOGGLING DAY AND NIGHT THEMES
+const setTheme = (themeName) => {
+  if (themeName === "night") {
+    document.documentElement.style.setProperty("--color-dark", "255, 255, 255");
+    document.documentElement.style.setProperty("--color-light", "10, 10, 20");
+  } else {
+    document.documentElement.style.setProperty("--color-dark", "10, 10, 20");
+    document.documentElement.style.setProperty(
+      "--color-light",
+      "255, 255, 255"
+    );
+  }
+};
+
 if (
   window.matchMedia &&
   window.matchMedia("(prefers-color-scheme: dark)").matches //checks if the user prefers dark mode on their system
 ) {
-  themeToggleSelect.value = "night"; //selects the "night" option from the "overlay__input" <select>
-  document.documentElement.style.setProperty("--color-dark", "255, 255, 255"); //sets base colors (CSS) to match a dark theme
-  document.documentElement.style.setProperty("--color-light", "10, 10, 20");
-} else {
-  themeToggleSelect.value = "day"; //selects the "day" option from the "overlay__input" <select>
-  document.documentElement.style.setProperty("--color-dark", "10, 10, 20"); //sets base colors (CSS) to match a light theme
-  document.documentElement.style.setProperty("--color-light", "255, 255, 255");
+  setTheme("night");
 }
 
 //LOGIC FOR ENABLING THE SHOW MORE BUTTON
-showMoreBtn.disabled = matches.length - page * BOOKS_PER_PAGE > 0; //if there are no more books to be displayed then the button is set to disabled
+showMoreBtn.disabled = matches.length - page * BOOKS_PER_PAGE < 0; //if there are no more books to be displayed then the button is set to disabled
 
 //as the #books displays /, the number in the brackets should go down
 showMoreBtn.innerHTML = `
@@ -158,16 +159,7 @@ themeSettingsForm.addEventListener("submit", (event) => {
   const formData = new FormData(event.target);
   const { theme } = Object.fromEntries(formData);
 
-  if (theme === "night") {
-    document.documentElement.style.setProperty("--color-dark", "255, 255, 255");
-    document.documentElement.style.setProperty("--color-light", "10, 10, 20");
-  } else {
-    document.documentElement.style.setProperty("--color-dark", "10, 10, 20");
-    document.documentElement.style.setProperty(
-      "--color-light",
-      "255, 255, 255"
-    );
-  }
+  setTheme(theme);
   //closes the settings modal after changing the theme and pressing save (not saved to localStorage)
   settingsOverlay.open = false;
 });
@@ -180,8 +172,7 @@ bookSearchForm.addEventListener("submit", (event) => {
 
   /*This for loop checks each book in the books array for any book that matches the genre that was selected by the user or for any books whose
     title matches the one typed in by the user. 
-    
-    */
+  */
   for (const book of books) {
     let genreMatch = filters.genre === "any";
 
