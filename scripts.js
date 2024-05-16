@@ -67,45 +67,54 @@ displayBooksPreviews(matches, authors);
 //CREATING THE LIST OF ALL GENRES IN THE SEARCH MODAL
 
 //doc. frag. for the genres drop-down found in the search modal
-const genreSelectFrag = document.createDocumentFragment();
 
 //ensures that the first option in the select is "all genres"
-const firstGenreElement = document.createElement("option"); //it would be semantically correct to put this inside a <select></select>
-firstGenreElement.value = "any";
-firstGenreElement.innerText = "All Genres";
-genreSelectFrag.appendChild(firstGenreElement);
 
 //loops through the genres array and creates an <option> for each genre and appends all the genre options to the genreHTML doc. fragment
-for (const [id, name] of Object.entries(genres)) {
-  const genreOption = document.createElement("option"); //confusion: "element" was already created in line 15
-  genreOption.value = id;
-  genreOption.innerText = name;
-  genreSelectFrag.appendChild(genreOption);
-}
 
 //pushes the genreHTML doc. fragment to the DOM via the div named data-search-genres
-genreDropDownMenu.appendChild(genreSelectFrag);
+
+const createSelect = (array, name, dropdown) => {
+  const selectFrag = document.createDocumentFragment();
+
+  const firstOption = document.createElement("option"); //it would be semantically correct to put this inside a <select></select>
+  firstOption.value = "any";
+  firstOption.innerText = `All ${name}s`;
+  selectFrag.appendChild(firstOption);
+
+  for (const [id, name] of Object.entries(array)) {
+    const option = document.createElement("option"); //confusion: "element" was already created in line 15
+    option.value = id;
+    option.innerText = name;
+    selectFrag.appendChild(option);
+  }
+
+  dropdown.appendChild(selectFrag);
+};
+
+createSelect(genres, "Genre", genreDropDownMenu);
 
 //CREATING THE LIST OF ALL AUTHORS IN THE SEARCH MODAL
+createSelect(authors, "Author", authorDropDownMenu);
 
 //doc. frag. for the authors drop-down found in the search modal
-const authorSelectFrag = document.createDocumentFragment();
+//const authorSelectFrag = document.createDocumentFragment();
 
 //ensures that the first option in the select is "all authors"
-const firstAuthorElement = document.createElement("option");
-firstAuthorElement.value = "any";
-firstAuthorElement.innerText = "All Authors";
-authorSelectFrag.appendChild(firstAuthorElement);
+// const firstAuthorElement = document.createElement("option");
+// firstAuthorElement.value = "any";
+// firstAuthorElement.innerText = "All Authors";
+// authorSelectFrag.appendChild(firstAuthorElement);
 
 //loops through the authors array and creates an <option> for each author and appends all the author options to the authorSelectFrag doc. fragment
-for (const [id, name] of Object.entries(authors)) {
-  const authorOption = document.createElement("option");
-  authorOption.value = id;
-  authorOption.innerText = name;
-  authorSelectFrag.appendChild(authorOption);
-}
+// for (const [id, name] of Object.entries(authors)) {
+//   const authorOption = document.createElement("option");
+//   authorOption.value = id;
+//   authorOption.innerText = name;
+//   authorSelectFrag.appendChild(authorOption);
+// }
 //pushes the authorSelectFrag doc. fragment to the DOM via the div named data-search-authors
-authorDropDownMenu.appendChild(authorSelectFrag);
+//authorDropDownMenu.appendChild(authorSelectFrag);
 
 //TOGGLING DAY AND NIGHT THEMES
 if (
@@ -122,8 +131,9 @@ if (
 }
 
 //LOGIC FOR ENABLING THE SHOW MORE BUTTON
-showMoreBtn.innerText = `Show more (${books.length - BOOKS_PER_PAGE})`; //as the #books displays /, the number in the brackets should go down
+showMoreBtn.disabled = matches.length - page * BOOKS_PER_PAGE > 0; //if there are no more books to be displayed then the button is set to disabled
 
+//as the #books displays /, the number in the brackets should go down
 showMoreBtn.innerHTML = `
     <span>Show more</span>
     <span class="list__remaining"> (${
@@ -131,9 +141,7 @@ showMoreBtn.innerHTML = `
         ? matches.length - page * BOOKS_PER_PAGE
         : 0
     })</span>
-`; //this is basically repetition
-
-showMoreBtn.disabled = matches.length - page * BOOKS_PER_PAGE > 0; //if there are no more books to be displayed then the button is set to disabled
+`;
 
 //EVENT LISTENERS
 //"Cancel" to close the search modal
@@ -224,34 +232,7 @@ bookSearchForm.addEventListener("submit", (event) => {
 
   booksListDiv.innerHTML = ""; //makes the page that's supposed to show all the book previews empty
 
-  //DISPLAYING THE FILTERED BOOKS TO THE DOM (can reuse the earlier function for displaying objects but tweak it a little)
-  // const newItemsFrag = document.createDocumentFragment();
-
-  // for (const { author, id, image, title } of filteredBooksArray.slice(
-  //   0,
-  //   BOOKS_PER_PAGE
-  // )) {
-  //   const element = document.createElement("button");
-  //   element.classList = "preview";
-  //   element.setAttribute("data-preview", id);
-
-  //   element.innerHTML = `
-  //           <img
-  //               class="preview__image"
-  //               src="${image}"
-  //           />
-
-  //           <div class="preview__info">
-  //               <h3 class="preview__title">${title}</h3>
-  //               <div class="preview__author">${authors[author]}</div>
-  //           </div>
-  //       `;
-
-  //   newItemsFrag.appendChild(element);
-  // }
-
-  // booksListDiv.appendChild(newItemsFrag);
-
+  //DISPLAYING THE FILTERED BOOKS TO THE DOM
   displayBooksPreviews(filteredBooksArray, authors);
 
   //same logic for the "show more" button
