@@ -97,24 +97,6 @@ createSelect(genres, "Genre", genreDropDownMenu);
 //CREATING THE LIST OF ALL AUTHORS IN THE SEARCH MODAL
 createSelect(authors, "Author", authorDropDownMenu);
 
-//doc. frag. for the authors drop-down found in the search modal
-//const authorSelectFrag = document.createDocumentFragment();
-
-//ensures that the first option in the select is "all authors"
-// const firstAuthorElement = document.createElement("option");
-// firstAuthorElement.value = "any";
-// firstAuthorElement.innerText = "All Authors";
-// authorSelectFrag.appendChild(firstAuthorElement);
-
-//loops through the authors array and creates an <option> for each author and appends all the author options to the authorSelectFrag doc. fragment
-// for (const [id, name] of Object.entries(authors)) {
-//   const authorOption = document.createElement("option");
-//   authorOption.value = id;
-//   authorOption.innerText = name;
-//   authorSelectFrag.appendChild(authorOption);
-// }
-//pushes the authorSelectFrag doc. fragment to the DOM via the div named data-search-authors
-//authorDropDownMenu.appendChild(authorSelectFrag);
 
 //TOGGLING DAY AND NIGHT THEMES
 if (
