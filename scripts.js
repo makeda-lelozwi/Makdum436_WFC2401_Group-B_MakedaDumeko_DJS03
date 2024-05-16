@@ -288,13 +288,22 @@ document.querySelector("[data-list-button]").addEventListener("click", () => {
   page += 1;
 });
 
-//EVENT LISTENER FOR DISPLAYING BOOK INFO WHEN CLICKING ON IT
+//EVENT LISTENER FOR DISPLAYING BOOK INFO WHEN CLICKING ON ITS PREVIEW
 document
   .querySelector("[data-list-items]")
   .addEventListener("click", (event) => {
-    const pathArray = Array.from(event.path || event.composedPath());
+    const pathArray = Array.from(event.path || event.composedPath()); //retrieves clicked element's path
     let active = null;
 
+    /* Iterates through each element in the path array and checks if each element has the attribute of "dataset.preview".
+    If it finds an element with the attribute, it looks for the corresponding book in the "books" array based on the id stored in the dataset.
+    Once it finds the corresponding book, it updates the UI to display details of the clicked book:
+    - reveals a modal
+    - sets the book's cover as the img tag's source
+    - updates the titles with the book's title and author (taking the name from the "authors" array)
+    also sets the publication date
+    - updates the description with the book's description    
+    */
     for (const node of pathArray) {
       if (active) break;
 
