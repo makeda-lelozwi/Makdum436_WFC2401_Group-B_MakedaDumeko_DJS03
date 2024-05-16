@@ -1,8 +1,5 @@
 import { books, authors, genres, BOOKS_PER_PAGE } from "./data.js";
 
-let page = 1; //unclear variable naming
-let matches = books; //maybe change this to booksArray or booksObject
-
 //ALL THE NECESSARY ELEMENTS FROM THE DOM
 const booksListDiv = document.querySelector("[data-list-items]");
 
@@ -28,20 +25,24 @@ const settingsCancelBtn = document.querySelector("[data-settings-cancel]");
 const moreInfoOverlay = document.querySelector("[data-list-active]");
 const moreInfoOverlayCloseBtn = document.querySelector("[data-list-close]");
 
+let page = 1; //unclear variable naming
+let matches = books; //maybe change this to booksArray or booksObject
+
 //DISPLAYING THE FIRST 36 BOOKS TO DOM
 
-//use document fragments to periodically push elements/changes to the DOM; unclear name
-const initialPageLoadFrag = document.createDocumentFragment();
+/* Use document fragments to periodically push elements/changes to the DOM. Iterates over the books array, takes out the first 36 items (books) 
+from that array, and adds them them to the doc. frag. as a collection of clickable previews (showing the cover, title and author(s) of the book).
+Pushes the doc. frag. to the DOM by appending to a pre-existing div in the HTML (with the name "data-list-items").*/
 
-/*iterates over the books array, takes out the first 36 items (books) from that array, and adds them them to the doc. frag.
-as a collection of clickable previews
-(showing the cover, title and author(s) of the book)*/
-for (const { author, id, image, title } of matches.slice(0, BOOKS_PER_PAGE)) {
-  const bookPreviewBtn = document.createElement("button"); //use more descriptive naming
-  bookPreviewBtn.classList = "preview";
-  bookPreviewBtn.setAttribute("data-preview", id); //creates new custom attribute called "data-preview" and sets the value to be the book's id
+const displayBooksPreviews = (matches, authors) => {
+  const pageLoadFrag = document.createDocumentFragment();
 
-  bookPreviewBtn.innerHTML = `
+  for (const { author, id, image, title } of matches.slice(0, BOOKS_PER_PAGE)) {
+    const bookPreviewBtn = document.createElement("button");
+    bookPreviewBtn.classList = "preview";
+    bookPreviewBtn.setAttribute("data-preview", id); //creates new custom attribute called "data-preview" and sets the value to be the book's id
+
+    bookPreviewBtn.innerHTML = `
         <img
             class="preview__image"
             src="${image}"
@@ -53,11 +54,15 @@ for (const { author, id, image, title } of matches.slice(0, BOOKS_PER_PAGE)) {
         </div>
     `;
 
-  initialPageLoadFrag.appendChild(bookPreviewBtn);
-}
+    pageLoadFrag.appendChild(bookPreviewBtn);
+  }
 
-//pushes the doc. frag. to the DOM by appending to a pre-existing div in the HTML (with the name "data-list-items")
-booksListDiv.appendChild(initialPageLoadFrag);
+  booksListDiv.appendChild(pageLoadFrag);
+
+  return booksListDiv;
+};
+
+displayBooksPreviews(matches, authors);
 
 //CREATING THE LIST OF ALL GENRES IN THE SEARCH MODAL
 
@@ -220,32 +225,34 @@ bookSearchForm.addEventListener("submit", (event) => {
   booksListDiv.innerHTML = ""; //makes the page that's supposed to show all the book previews empty
 
   //DISPLAYING THE FILTERED BOOKS TO THE DOM (can reuse the earlier function for displaying objects but tweak it a little)
-  const newItemsFrag = document.createDocumentFragment();
+  // const newItemsFrag = document.createDocumentFragment();
 
-  for (const { author, id, image, title } of filteredBooksArray.slice(
-    0,
-    BOOKS_PER_PAGE
-  )) {
-    const element = document.createElement("button");
-    element.classList = "preview";
-    element.setAttribute("data-preview", id);
+  // for (const { author, id, image, title } of filteredBooksArray.slice(
+  //   0,
+  //   BOOKS_PER_PAGE
+  // )) {
+  //   const element = document.createElement("button");
+  //   element.classList = "preview";
+  //   element.setAttribute("data-preview", id);
 
-    element.innerHTML = `
-            <img
-                class="preview__image"
-                src="${image}"
-            />
-            
-            <div class="preview__info">
-                <h3 class="preview__title">${title}</h3>
-                <div class="preview__author">${authors[author]}</div>
-            </div>
-        `;
+  //   element.innerHTML = `
+  //           <img
+  //               class="preview__image"
+  //               src="${image}"
+  //           />
 
-    newItemsFrag.appendChild(element);
-  }
+  //           <div class="preview__info">
+  //               <h3 class="preview__title">${title}</h3>
+  //               <div class="preview__author">${authors[author]}</div>
+  //           </div>
+  //       `;
 
-  booksListDiv.appendChild(newItemsFrag);
+  //   newItemsFrag.appendChild(element);
+  // }
+
+  // booksListDiv.appendChild(newItemsFrag);
+
+  displayBooksPreviews(filteredBooksArray, authors);
 
   //same logic for the "show more" button
   showMoreBtn.disabled = matches.length - page * BOOKS_PER_PAGE < 1;
