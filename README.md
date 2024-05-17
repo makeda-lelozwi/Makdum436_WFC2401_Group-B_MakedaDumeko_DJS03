@@ -19,10 +19,12 @@ The focus of this project is to enhance the code's maintainability, extendibilit
 
    - **Objects**: Define objects to represent key elements of the application, such as books, authors, and genres. Utilize the provided data (e.g., `authors`, `genres`, `books`) to populate these objects.
 
-   - **Functions**: Created functions that handle repetitive tasks, such as rendering the book list, handling user interactions, and applying filters.
+   - **Functions**: Created functions that handle repetitive tasks, such as rendering the book list, handling user interactions, and applying filters:
+
    - Lines 31 - 44 and 46 - 59: A more generic function (createSelect) can be used to create drop-down menus for authors and genres
    - Lines 9 - 29 and 180 - 203: A more generic function (displayBooksPreview) can be used to display book previews on the DOM.
    - Lines 65 - 71 and 121 - 131: The setTheme() function was used to in both instances to toggle light and dark themes.
+   - Lines 74 - 86 and 206 - 215: The updateShowMoreBtn() function was used to display the show more button on the page
 
 3. **Adherence to Styleguides**: Renamed variables so that my code follows JavaScript and HTML coding standards and best practices for readability and maintainability.
 

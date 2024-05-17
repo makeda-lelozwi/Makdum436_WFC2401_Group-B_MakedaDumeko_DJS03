@@ -23,19 +23,18 @@ const settingsCancelBtn = document.querySelector("[data-settings-cancel]");
 const moreInfoOverlay = document.querySelector("[data-list-active]");
 const moreInfoOverlayCloseBtn = document.querySelector("[data-list-close]");
 
-let page = 1; //unclear variable naming
-let matches = books; //maybe change this to booksArray or booksObject
+let page = 1;
+let booksArray = books;
 
 //DISPLAYING THE FIRST 36 BOOKS TO DOM
-
 /* Use document fragments to periodically push elements/changes to the DOM. Iterates over the books array, takes out the first 36 items (books) 
 from that array, and adds them them to the doc. frag. as a collection of clickable previews (showing the cover, title and author(s) of the book).
 Pushes the doc. frag. to the DOM by appending to a pre-existing div in the HTML (with the name "data-list-items").*/
 
-const displayBooksPreviews = (matches, authors) => {
+const displayBooksPreviews = (array, authors) => {
   const pageLoadFrag = document.createDocumentFragment();
 
-  for (const { author, id, image, title } of matches.slice(0, BOOKS_PER_PAGE)) {
+  for (const { author, id, image, title } of array.slice(0, BOOKS_PER_PAGE)) {
     const bookPreviewBtn = document.createElement("button");
     bookPreviewBtn.classList = "preview";
     bookPreviewBtn.setAttribute("data-preview", id); //creates new custom attribute called "data-preview" and sets the value to be the book's id
@@ -46,7 +45,7 @@ const displayBooksPreviews = (matches, authors) => {
             src="${image}"
         />
         
-        <div class="preview__info">
+        <div class="preview__info"> 
             <h3 class="preview__title">${title}</h3>
             <div class="preview__author">${authors[author]}</div>
         </div>
@@ -60,10 +59,9 @@ const displayBooksPreviews = (matches, authors) => {
   return booksListDiv;
 };
 
-displayBooksPreviews(matches, authors);
+displayBooksPreviews(booksArray, authors);
 
 //CREATING THE LIST OF ALL GENRES IN THE SEARCH MODAL
-
 /*doc. frag. for the genres drop-down found in the search modal
 ensures that the first option in the select is "all genres"
 loops through the genres array and creates an <option> for each genre and appends all the genre options to the genreHTML doc. fragment
@@ -114,17 +112,25 @@ if (
 }
 
 //LOGIC FOR ENABLING THE SHOW MORE BUTTON
-showMoreBtn.disabled = matches.length - page * BOOKS_PER_PAGE < 0; //if there are no more books to be displayed then the button is set to disabled
+//if there are no more books to be displayed then the button is set to disabled
+const updateShowMoreBtn = () => {
+  if (booksArray.length - page * BOOKS_PER_PAGE < 1) {
+    showMoreBtn.disabled = true;
+  }
 
-//as the #books displays /, the number in the brackets should go down
-showMoreBtn.innerHTML = `
+  showMoreBtn.innerHTML = `
     <span>Show more</span>
-    <span class="list__remaining"> (${
-      matches.length - page * BOOKS_PER_PAGE > 0
-        ? matches.length - page * BOOKS_PER_PAGE
+    <span class = "list__remaining"> (${
+      booksArray.length - page * BOOKS_PER_PAGE > 0
+        ? booksArray.length - page * BOOKS_PER_PAGE
         : 0
     })</span>
 `;
+};
+
+updateShowMoreBtn();
+
+//as the #books displays /, the number in the brackets should go down
 
 //EVENT LISTENERS
 //"Cancel" to close the search modal
@@ -194,7 +200,7 @@ bookSearchForm.addEventListener("submit", (event) => {
   }
 
   page = 1;
-  matches = filteredBooksArray;
+  booksArray = filteredBooksArray;
 
   //Error handling for if there is no book that matches the search/filter, then the message already typed in the HTML will show
   if (filteredBooksArray.length < 1) {
@@ -209,16 +215,7 @@ bookSearchForm.addEventListener("submit", (event) => {
   displayBooksPreviews(filteredBooksArray, authors);
 
   //same logic for the "show more" button
-  showMoreBtn.disabled = matches.length - page * BOOKS_PER_PAGE < 1;
-
-  showMoreBtn.innerHTML = `
-        <span>Show more</span>
-        <span class="list__remaining"> (${
-          matches.length - page * BOOKS_PER_PAGE > 0
-            ? matches.length - page * BOOKS_PER_PAGE
-            : 0
-        })</span>
-    `;
+  updateShowMoreBtn();
 
   window.scrollTo({ top: 0, behavior: "smooth" });
   searchOverlay.open = false;
@@ -228,7 +225,7 @@ bookSearchForm.addEventListener("submit", (event) => {
 showMoreBtn.addEventListener("click", () => {
   const fragment = document.createDocumentFragment();
 
-  for (const { author, id, image, title } of matches.slice(
+  for (const { author, id, image, title } of booksArray.slice(
     page * BOOKS_PER_PAGE,
     (page + 1) * BOOKS_PER_PAGE
   )) {
@@ -268,7 +265,8 @@ booksListDiv.addEventListener("click", (event) => {
     - updates the titles with the book's title and author (taking the name from the "authors" array)
     also sets the publication date
     - updates the description with the book's description    
-    */
+  */
+
   for (const node of pathArray) {
     if (active) break;
 
